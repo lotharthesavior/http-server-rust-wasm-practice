@@ -2,6 +2,7 @@ use std::net::SocketAddr;
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Method, Request, Response, StatusCode};
+use hyper::body::Bytes;
 use tokio::net::TcpListener;
 
 /// This is our service handler. It receives a Request, routes on its
@@ -22,6 +23,13 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             let reversed_body = whole_body.iter().rev().cloned().collect::<Vec<u8>>();
             Ok(Response::new(Body::from(reversed_body)))
         }
+
+        // The new service endpoint
+        (&Method::POST, "/parrot") => {
+            let body : Bytes = hyper::body::to_bytes(req.into_body()).await?;
+            let body_str : String = String::from_utf8(body.to_vec()).unwrap();
+            Ok(Response::new(Body::from(format!("You said: {}", body_str))))
+        },
 
         // Return the 404 Not Found for other routes.
         _ => {
