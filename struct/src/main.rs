@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Lang {
   English,
   Spanish,
@@ -29,7 +29,13 @@ fn main() {
   let g : Greeting = Greeting { lang: Lang::Japanese, message: String::from("こんにちは WasmEdge!") };
   v.push(g);
 
-  for e in v {
+  for e in &v {
     println!("{:?} {}", e.lang, e.message);
+  }
+
+  let queried = v.iter().filter(|&x| x.lang == Lang::Spanish).collect::<Vec<_>>();
+  println!("\n\nQuerying for spanish language...\n");
+  for e in queried {
+    println!("Queries language: {:?} {}", e.lang, e.message);
   }
 }
